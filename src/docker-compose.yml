@@ -1,0 +1,120 @@
+services:
+  # Shell (Host) Application
+  ecommerce-shell:
+    hostname: shell
+    build:
+      context: ./ecommerce-shell
+      dockerfile: Dockerfile
+    container_name: ecommerce-shell
+    ports:
+      - '8080:80'
+    networks:
+      - microfrontend-network
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test:
+        ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost/']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Products Micro-frontend
+  ecommerce-products:
+    hostname: products
+    build:
+      context: ./ecommerce-products
+      dockerfile: Dockerfile
+    container_name: ecommerce-products
+    ports:
+      - '8081:80'
+    networks:
+      - microfrontend-network
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test:
+        ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost/']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Cart Micro-frontend
+  ecommerce-cart:
+    hostname: cart
+    build:
+      context: ./ecommerce-cart
+      dockerfile: Dockerfile
+    container_name: ecommerce-cart
+    ports:
+      - '8082:80'
+    networks:
+      - microfrontend-network
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test:
+        ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost/']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Profile Micro-frontend
+  ecommerce-profile:
+    hostname: profile
+    build:
+      context: ./ecommerce-profile
+      dockerfile: Dockerfile
+    container_name: ecommerce-profile
+    ports:
+      - '8083:80'
+    networks:
+      - microfrontend-network
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test:
+        ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost/']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Reverse Proxy
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - '9080:80' # Cambiato da porta 80 a 8080
+    volumes:
+      - ./nginx-proxy.conf:/etc/nginx/nginx.conf
+    networks:
+      - microfrontend-network
+    depends_on:
+      - ecommerce-shell
+      - ecommerce-products
+      - ecommerce-cart
+      - ecommerce-profile
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'wget',
+          '--quiet',
+          '--tries=1',
+          '--spider',
+          'http://localhost/health',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  microfrontend-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

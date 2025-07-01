@@ -1,0 +1,27 @@
+{
+  "name": "tutorial-micro-frontend",
+  "version": "1.0.0",
+  "description": "Micro-frontend E-commerce con Native Federation - Angular 20",
+  "main": "index.js",
+  "repository": "git@github.com:LupinIIIit/tutorial-microfronted.git",
+  "author": "Antonio Narra",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build:all": "./build-all.sh",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:clean": "docker-compose down --rmi all --volumes",
+    "deploy": "./deploy.sh",
+    "start:all": "concurrently \"yarn run start:shell\" \"yarn run start:products\" \"yarn run start:cart\" \"yarn run start:profile\"",
+    "start:shell": "cd ecommerce-shell && ng serve  --port 8080",
+    "start:products": "cd ecommerce-products && ng serve --port 8081",
+    "start:cart": "cd ecommerce-cart && ng serve --port 8082",
+    "start:profile": "cd ecommerce-profile && ng serve --port 8083"
+  },
+  "dependencies": {
+    "@angular-architects/native-federation": "^20.0.6"
+  }
+}
